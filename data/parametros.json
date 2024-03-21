@@ -9,7 +9,5 @@
     { "id": 3, "uNombre": "Loft del viajero", "uPiso": "P3", "uCategoria": "Estándar", "uCapacidad": 4, "uObservacion":"" },
     { "id": 4, "uNombre": "Class", "uPiso": "P4", "uCategoria": "Estándar", "uCapacidad": 5, "uObservacion":"Frigobar vacio" },
     { "id": 5, "uNombre": "Loft jardín de invierno", "uPiso": "P5", "uCategoria": "Estándar", "uCapacidad": 6, "uObservacion":"Llevar una cuna" }
-
-
   ]
 }
