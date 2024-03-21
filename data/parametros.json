@@ -1,0 +1,15 @@
+{
+  "hoteles": ["Faraon Hotel", "Hotel del Lago", "Apart Montañas"],
+  "Pisos": ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10"],
+  "Categorias": ["Superior", "Estándar"],
+  "Capacidades": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+  "unidades": [
+    { "id": 1, "uNombre": "Faraon SPA Room", "uPiso": "P1", "uCategoria": "Estándar", "uCapacidad": 2, "uObservacion":"Ocupada" },
+    { "id": 2, "uNombre": "Palace", "uPiso": "P2", "uCategoria": "Estándar", "uCapacidad": 3, "uObservacion":"Para limpiar" },
+    { "id": 3, "uNombre": "Loft del viajero", "uPiso": "P3", "uCategoria": "Estándar", "uCapacidad": 4, "uObservacion":"" },
+    { "id": 4, "uNombre": "Class", "uPiso": "P4", "uCategoria": "Estándar", "uCapacidad": 5, "uObservacion":"Frigobar vacio" },
+    { "id": 5, "uNombre": "Loft jardín de invierno", "uPiso": "P5", "uCategoria": "Estándar", "uCapacidad": 6, "uObservacion":"Llevar una cuna" }
+
+
+  ]
+}

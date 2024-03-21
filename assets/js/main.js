@@ -1,49 +1,136 @@
-const hotelDelMar = {
-    pisos: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10"],
-    categorias: ["Superior", "Estándar"],
-    capacidad: Array.from({ length: 20 }, (_, index) => index + 1), // Array de 1 a 20
-    unidades: [
-        { id: 1, piso: "P1", unidad: "P01", tipo: "Estándar", capacidad: 2 },
-        { id: 2, piso: "P1", unidad: "P02", tipo: "Estándar", capacidad: 3 },
-        { id: 3, piso: "P1", unidad: "P03", tipo: "Superior", capacidad: 2 },
-        { id: 4, piso: "P1", unidad: "P04", tipo: "Superior", capacidad: 3 }
-    ]
-};
+const preloadMessage = document.getElementById('preloadMessage');
+const unidadId = document.getElementById("unidadId");
+const unidadNombre = document.getElementById("unidadNombre");
+const unidadPiso = document.getElementById("unidadPiso");
+const unidadCategoria = document.getElementById("unidadCategoria");
+const unidadCapacidad = document.getElementById("unidadCapacidad");
+const unidadObservaciones = document.getElementById("unidadObservaciones");
+const unidadesLista = document.getElementById("unidadesLista");
+const mainBtn = document.getElementById("mainBtn");
 
-// Obtener registros del localStorage
-const historialLocalStorage = localStorage.getItem("historial");
+let unidades = [];
+let pisos;
+let categorias;
+let capacidades;
+let gIndex;
 
-// Parsear registros del localStorage
-const historialUnidades = historialLocalStorage ? JSON.parse(historialLocalStorage) : [];
-
-
-let unidadesContainer = document.getElementById("lista-unidades");
-
-function renderunidades(unidadesArray) {
-    unidadesContainer.innerHTML = ""; // Limpiar el contenido existente
-    unidadesArray.forEach(unidad => {
-        const fila = document.createElement("tr");
-        fila.innerHTML = `<th scope="row">${unidad.id}</th>
-                            <td>${unidad.piso}</td>
-                            <td>${unidad.unidad}</td>
-                            <td>${unidad.tipo}</td>
-                            <td>${unidad.capacidad}</td>
-                            <!-- <td><button type="button" class="btn btn-primary btn-sm unidadEditar abrirModal" data-id="${unidad.id}" data-modal="ModalEditarUnidad">Editar</button> <button type="button" class="btn btn-secondary btn-sm unidadEliminar" id="${unidad.id}">Eliminar</button></td> -->`;
-        
-        unidadesContainer.appendChild(fila);
+function simulatePreload() {        
+    return new Promise(resolve => {
+        setTimeout(() => {
+            preloadMessage.style.display = "none";
+            resolve();
+        }, 2000);
     });
-
-    addUnidad();
 }
 
-//aca renderizo y muestro la tabla
-renderunidades(hotelDelMar.unidades);
+function fetchData(url) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            await simulatePreload(); // Esperar a que termine la precarga
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            resolve(data);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
 
+function addItem() {
+    if (nameregex() && pisoregex() && catregex() && capacregex()) {
+        const productobject = {
+            uNombre: unidadNombre.value,
+            uPiso: unidadPiso.value,
+            uCategoria: unidadCategoria.value,
+            uCapacidad: unidadCapacidad.value,
+            uObservacion: unidadObservaciones.value,
+        };
+        unidades.push(productobject);
+        display(unidades);
+        localStorage.setItem("data", JSON.stringify(unidades));
+        clear()
+    }
+}
 
-// voy a necesitar los campos tipo seleccionables para el modal. 
-// Función para llenar un select
+function check() {
+    unidades = JSON.parse(localStorage.getItem("data")) || [];
+    display(unidades);
+}
 
-function llenarSelect(array, idSelect) {
+function display(arr) {
+    let box = "";
+    for (let i = 0; i < arr.length; i++) {
+        box += `
+        <tr>
+            <td>${i + 1}</td>
+            <td>${arr[i].uNombre}</td>
+            <td>${arr[i].uPiso}</td>
+            <td>${arr[i].uCategoria}</td>
+            <td>${arr[i].uCapacidad}</td>
+            <td>${arr[i].uObservacion}</td>
+            <td>
+            <button class="btn btn-sm btn-danger  me-3" onclick="Del(${i})"><i class="bi bi-trash-fill"></i> Eliminar</button>
+            <button class="btn btn-sm btn-warning" onclick="Update(${i})"><i class="bi bi-pencil-square"></i> Editar</button>
+            </td>
+
+        </tr>
+        `;
+    }
+    unidadesLista.innerHTML = box;
+}
+
+function Del(index) {
+    unidades.splice(index, 1);
+    display(unidades);
+    localStorage.setItem("data", JSON.stringify(unidades)); 
+}
+
+function Update(index) {
+    gIndex = index;
+    unidadNombre.value = unidades[index].uNombre;
+    unidadPiso.value = unidades[index].uPiso;
+    unidadCategoria.value = unidades[index].uCategoria;
+    unidadCapacidad.value = unidades[index].uCapacidad;
+    unidadObservaciones.value = unidades[index].uObservacion;
+    mainBtn.innerHTML = "Guardar";
+}
+
+function edit() {
+    if (nameregex() && pisoregex() && catregex() && capacregex()) {
+        unidades[gIndex].uNombre = unidadNombre.value;
+        unidades[gIndex].uPiso = unidadPiso.value;
+        unidades[gIndex].uCategoria = unidadCategoria.value;
+        unidades[gIndex].uCapacidad = unidadCapacidad.value;
+        unidades[gIndex].uObservacion = unidadObservaciones.value;
+        display(unidades);
+        localStorage.setItem('data', JSON.stringify(unidades))
+        mainBtn.innerHTML = 'Agregar'
+        clear()
+    }
+}
+
+function clear() {
+    unidadNombre.value = "";
+    unidadPiso.value = "";
+    unidadCategoria.value = "";
+    unidadCapacidad.value ="";
+    unidadObservaciones.value = "";
+}
+
+function search(ele) {
+    let searchedarr = [];
+    for (let i = 0; i < unidades.length; i++) {
+        if (unidades[i].uNombre.toLowerCase().includes(ele.value.toLowerCase())) {
+            searchedarr.push(unidades[i])
+        }
+    }
+    display(searchedarr)
+}
+
+function fullSelect(array, idSelect) {
     const select = document.getElementById(idSelect);
     array.forEach(item => {
         const option = document.createElement("option");
@@ -53,76 +140,98 @@ function llenarSelect(array, idSelect) {
     });
 }
 
-// Llenar los selects con los valores correspondientes
-llenarSelect(hotelDelMar.pisos, "pisoSelect");
-llenarSelect(hotelDelMar.categorias, "categoriaSelect");
-llenarSelect(hotelDelMar.capacidad, "capacidadSelect");
+// Controles y validaciones
 
-function addUnidad() {
-    const form = document.getElementById("formNuevaUnidad");
-    
-    const submitHandler = function(event) {
-        event.preventDefault(); // Evitar que el formulario se envíe
-        
-        const piso = form.piso.value;
-        const unidad = form.unidad.value;
-        const categoria = form.categoria.value;
-        const capacidad = parseInt(form.capacidad.value); // Convertir a entero
-        
-        const nuevaUnidad = {
-            id: hotelDelMar.unidades.length + 1, // Generar un nuevo ID
-            piso: piso,
-            unidad: unidad,
-            tipo: categoria,
-            capacidad: capacidad
-        };
-
-        // Agregar la nueva unidad al array de unidades
-        hotelDelMar.unidades.push(nuevaUnidad);
-
-        // Guardo y actualizado en el localStorage
-        localStorage.setItem("unidades", JSON.stringify(hotelDelMar.unidades));
-
-        // renderizo de vuelta la tabla
-        renderunidades(hotelDelMar.unidades);
-
-        // cerramos el modal
-        const modal = document.getElementById("ModalAgregarUnidad");
-        modal.classList.remove("show");
-
-        // limpio el form del modal
-        form.reset();
-
-        // elimino el event porque sino se duplica
-        form.removeEventListener("submit", submitHandler);
-    };
-
-    form.addEventListener("submit", submitHandler);
+function nameregex() {
+    const regex = /[a-zA-Z]{1,20}/
+        if (regex.test(unidadNombre.value)) {
+            return true;
+        } else {
+            //alert("Falta Nombre");
+            Swal.fire("Falta campo nombre");
+            return false;
+        }
 }
 
-document.addEventListener("DOMContentLoaded", function() {
+function pisoregex() {
+    const regex = /[0-9]{1,10}/
+    if (regex.test(unidadPiso.value)) {
+        return true;
+    } else {
+        //alert("Falta Piso");
+        Swal.fire("Falta campo Piso");
+        return false;
+    }
+}
 
-    const abrirModalLinks = document.querySelectorAll(".abrirModal");
-    const cerrarModalBtns = document.querySelectorAll(".cerrarModal");
+function catregex() {
+    const regex = /[a-zA-Z]{1,10}/
+    if (regex.test(unidadCategoria.value)) {
+        return true;
+    } else {
+        //alert("Falta Categoria");
+        Swal.fire("Falta campo Categoria");
+        return false;
+    }
+}
+
+function capacregex() {
+    const regex = /[0-9]{1,10}/
+    if (regex.test(unidadCapacidad.value)) {
+        return true;
+    } else {
+        //alert("Falta Capacidad");
+        Swal.fire("Falta campo Capacidad");
+        return false;
+    }
+}
 
 
-abrirModalLinks.forEach(link => {
-    link.addEventListener("click", function(event) {
-        event.preventDefault(); // Evita que el enlace siga el vínculo
+document.addEventListener("DOMContentLoaded", function () {
+    // Cargar los datos del local storage al inicio
+    check();
 
-        const modalId = link.getAttribute("data-modal");
-        const modal = document.getElementById(modalId);
-        modal.classList.add("show");
-    });
+    fetchData('./data/parametros.json')
+        .then(data => {
+            //console.log('Datos obtenidos:', data);
+            //alert('¡El JSON se cargó con éxito!');
+            
+            // Extraer el array 'unidades' del JSON
+            const unidadesJSON = data.unidades;
+
+            // Insertar los elementos de 'unidadesJSON' al inicio de 'unidades'
+            if (unidades.length === 0) {
+                unidadesJSON.forEach(unidad => {
+                    unidades.unshift(unidad);
+                });
+            }
+
+            // Extraer otros arrays del JSON
+            pisos = data.Pisos;
+            fullSelect(pisos, "unidadPiso");
+
+            categorias = data.Categorias;
+            fullSelect(categorias, "unidadCategoria");
+
+            // Mostrar unidades actualizado en la consola
+            //console.log('unidades actualizado:', unidades);
+            
+            // Mostrar unidades en la tabla
+            display(unidades);
+        })
+        .catch(error => {
+            //console.error('Hubo un problema con la operación de fetch:', error);
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Algo Salio Mal!",
+                footer: '<a href="#">Realiza tu reclamo haciendo clic aquí</a>'
+            });
+        });
+
+    // Evento click del botón principal
+    mainBtn.onclick = () => {
+        if (mainBtn.innerHTML == "Agregar") addItem();
+        else edit();
+    };
 });
-
-cerrarModalBtns.forEach(btn => {
-    btn.addEventListener("click", function(event) {
-        event.preventDefault(); // Evita que el botón realice su acción predeterminada
-
-        const modal = btn.closest(".modal");
-        modal.classList.remove("show");
-    });
-});
-});
-
